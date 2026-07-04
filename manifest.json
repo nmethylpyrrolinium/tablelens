@@ -1,0 +1,9 @@
+{
+  "name": "TableLens",
+  "short_name": "TableLens",
+  "description": "A static WebAR cafe menu demo for previewing dishes in 3D and AR.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#120d09",
+  "theme_color": "#15100c"
+}

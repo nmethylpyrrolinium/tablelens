@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15100c">
+  <meta name="description" content="Preview a TableLens dish in 3D and AR.">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./style.css">
+  <title>Dish Preview · TableLens</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body data-page="dish">
+  <header class="sticky-bar">
+    <a class="brand compact" href="./index.html" aria-label="TableLens home"><span class="brand-mark">TL</span><span>TableLens</span></a>
+    <a class="home-link" href="./menu.html">Back to menu</a>
+  </header>
+
+  <main class="page-shell dish-page" id="dishRoot" aria-live="polite"></main>
+
+  <template id="modelViewerTemplate">
+    <model-viewer
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      camera-controls
+      auto-rotate
+      shadow-intensity="1"
+      exposure="1"
+      ar-scale="fixed"
+      loading="lazy"
+      reveal="auto">
+      <button class="ar-button" slot="ar-button">View in AR</button>
+      <div class="viewer-progress" slot="progress-bar">Loading 3D preview…</div>
+    </model-viewer>
+  </template>
+
+  <script src="./menu-data.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>

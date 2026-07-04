@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15100c">
+  <meta name="description" content="TableLens is a static WebAR cafe menu demo for previewing dishes in 3D and AR.">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./style.css">
+  <title>TableLens · See your food before you order</title>
+</head>
+<body data-page="home">
+  <header class="site-header" aria-label="TableLens landing header">
+    <a class="brand" href="./index.html" aria-label="TableLens home"><span class="brand-mark">TL</span><span>TableLens</span></a>
+    <nav class="top-nav" aria-label="Primary navigation">
+      <a href="./menu.html">Demo Menu</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero-shell" aria-labelledby="hero-title">
+      <div class="hero-copy reveal-in">
+        <p class="eyebrow">Static WebAR menu demo</p>
+        <h1 id="hero-title">See your food before you order.</h1>
+        <p class="hero-text">Scan a QR code, open the menu, preview dishes in 3D, and place them on your table with AR.</p>
+        <div class="hero-actions" aria-label="Demo actions">
+          <a class="button button-primary" href="./menu.html">Open Demo Menu</a>
+          <a class="button button-ghost" href="./dish.html?id=signature-burger">View Featured Dish</a>
+        </div>
+        <p class="browser-note">No app install. Works directly from the browser.</p>
+      </div>
+
+      <div class="table-theatre reveal-in" aria-label="Cinematic tabletop menu preview" role="img">
+        <div class="table-surface"></div>
+        <div class="plate-orb"></div>
+        <div class="floating-card floating-card-one">
+          <span class="mini-label">Scan</span>
+          <strong>QR opens menu</strong>
+        </div>
+        <div class="floating-card floating-card-two">
+          <span class="mini-label">Preview</span>
+          <strong>3D dish stage</strong>
+        </div>
+        <div class="floating-card floating-card-three">
+          <span class="mini-label">AR</span>
+          <strong>Place on table</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="steps" aria-labelledby="steps-title">
+      <h2 id="steps-title">A table-first ordering preview</h2>
+      <div class="step-grid">
+        <article class="glass-panel"><span>1</span><h3>Scan</h3><p>Open a GitHub Pages-ready static menu from a QR code or link.</p></article>
+        <article class="glass-panel"><span>2</span><h3>Preview</h3><p>Browse hard-coded cafe dishes and inspect the selected item in 3D.</p></article>
+        <article class="glass-panel"><span>3</span><h3>Place in AR</h3><p>On supported phones, launch WebXR, Scene Viewer, or Quick Look AR.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">TableLens demo · Static WebAR menu engine</footer>
+</body>
+</html>
