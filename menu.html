@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15100c">
+  <meta name="description" content="Browse the TableLens static WebAR demo menu.">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./style.css">
+  <title>Demo Menu · TableLens</title>
+</head>
+<body data-page="menu">
+  <header class="sticky-bar">
+    <a class="brand compact" href="./index.html" aria-label="Back to TableLens home"><span class="brand-mark">TL</span><span>TableLens</span></a>
+    <a class="home-link" href="./index.html">Home</a>
+  </header>
+
+  <main class="page-shell menu-page">
+    <section class="menu-hero" aria-labelledby="restaurant-name">
+      <p class="eyebrow" id="restaurant-location">TableLens Phase 1 Demo</p>
+      <h1 id="restaurant-name">Walnut & Ember Cafe</h1>
+      <p id="restaurant-tagline">A cinematic cafe menu for the table in front of you.</p>
+      <p class="demo-note" id="restaurant-note">Tap any dish to preview it in 3D.</p>
+    </section>
+
+    <nav class="filter-wrap" aria-label="Dish categories">
+      <div class="filter-rail" id="categoryFilters"></div>
+    </nav>
+
+    <section aria-labelledby="menu-list-title">
+      <h2 class="sr-only" id="menu-list-title">Available dishes</h2>
+      <div class="dish-grid" id="menuCards"></div>
+      <div class="empty-state hidden" id="menuEmpty" role="status">No dishes match this category yet.</div>
+    </section>
+  </main>
+
+  <script src="./menu-data.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>
