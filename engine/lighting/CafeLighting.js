@@ -1,0 +1,2 @@
+import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
+export function addCafeLighting(scene) { scene.add(new THREE.HemisphereLight(0x83a6ff, 0x4b2713, 1.25)); const key = new THREE.DirectionalLight(0xffc982, 3.2); key.position.set(-3, 5, 4); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); scene.add(key); const rim = new THREE.PointLight(0x7ba7ff, 1.4, 9); rim.position.set(3, 2.6, -2.8); scene.add(rim); const glow = new THREE.PointLight(0xffad50, 1.8, 7); glow.position.set(0, .8, 1.8); scene.add(glow); return { key, rim, glow }; }

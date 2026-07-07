@@ -136,3 +136,51 @@ All internal links use relative paths, so the site works under a GitHub Pages pr
 - Phase 2: add QR artwork and restaurant-specific theming options.
 - Phase 2: add stronger local validation for model availability and asset sizes.
 - Phase 3: consider a lightweight content pipeline only if static editing becomes limiting.
+
+## TableLens WebGL Experience Layer
+
+```text
+app.js
+└── engine/
+    ├── animation/Scheduler.js       # one requestAnimationFrame loop, timing, FPS quality
+    ├── core/Timing.js               # delta-time clock and tab visibility pause
+    ├── interaction/PointerSystem.js # normalized pointer influence and velocity
+    ├── renderer/WebGLRenderer.js    # Three.js renderer, DPR caps, resizing
+    ├── camera/CinematicCamera.js    # damped camera fly-in, idle, scroll and pointer response
+    ├── scene/CafeTableScene.js      # procedural cafe table, plate, cup and menu props
+    ├── lighting/CafeLighting.js     # warm key, cool fill, rim and glow lighting
+    ├── particles/ParticleSystem.js  # lightweight dust/golden particles
+    ├── systems/ScrollEngine.js      # reveal observer and scroll depth signal
+    ├── ui/PhysicalCards.js          # spring-driven physical dish card motion
+    └── utilities/motion.js          # reduced-motion, clamp and spring helpers
+```
+
+### Performance report
+
+- The experience remains static and GitHub Pages compatible: all runtime code is browser-side JavaScript, CSS and CDN-loaded Three.js modules.
+- A single scheduler owns `requestAnimationFrame`, avoiding competing loops across rendering, pointer, scroll and card physics.
+- Device pixel ratio is capped to reduce mobile fill-rate cost while preserving sharpness.
+- The WebGL scene is procedural and low draw-call: table, plate, cup, menu prop, lights and one batched particle point cloud.
+- Particles use one `THREE.Points` draw call and automatically use a lower mobile count.
+- Animations pause when the tab is hidden through the central timing clock.
+- `prefers-reduced-motion` disables the WebGL canvas, particles, camera drift and card physics.
+- Card movement uses transform-only updates and spring interpolation; no layout properties are animated.
+- IntersectionObserver handles section reveals without scroll polling layout reads.
+- ResizeObserver handles canvas resize and camera projection updates.
+
+### FPS optimization report
+
+- Quality adapts from measured FPS in `Scheduler`: below 52 FPS the scene lowers quality, and below 42 FPS it lowers further.
+- Renderer pixel ratio is limited to `1.75` even on high-DPR devices.
+- Expensive WebGL initialization is only performed on the landing page canvas and is skipped for reduced-motion users.
+- Menu and dish pages reuse the scheduler for card physics and scroll reveals without creating a WebGL renderer.
+- Particle opacity responds to quality and particle counts are constrained for small screens.
+
+### Acceptance testing checklist
+
+- Landing page renders a true Three.js tabletop scene when WebGL and motion are available.
+- Camera movement is damped by the reusable cinematic camera controller.
+- Menu cards use delta-time spring physics for tilt, lift, overshoot and settling.
+- Pointer movement subtly influences cards, lights, particles and camera.
+- Reduced motion disables advanced animation paths.
+- Existing menu rendering, dish rendering and model-viewer AR wiring remain in `script.js`.

@@ -91,7 +91,7 @@ p { color: var(--muted); line-height: 1.65; }
 .filter-rail { display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 10px; scrollbar-width: none; }
 .category-pill { flex: 0 0 auto; min-height: 44px; padding: 0 18px; border-radius: 999px; color: var(--muted); background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09); }
 .category-pill.active { color: #1a1008; background: var(--gold); border-color: var(--gold); }
-.dish-card { overflow: hidden; transition: transform .18s ease, border-color .18s ease; will-change: transform; }
+.dish-card { position: relative; overflow: hidden; transition: transform .18s ease, border-color .18s ease; will-change: transform; }
 .dish-card:hover { border-color: color-mix(in srgb, var(--dish-accent), white 20%); }
 .dish-card-link { display: grid; height: 100%; }
 .dish-image { min-height: 190px; background: radial-gradient(circle at 50% 45%, var(--dish-accent, #d8a14a), #342014 48%, #18100b 80%); position: relative; overflow: hidden; }
@@ -121,7 +121,7 @@ model-viewer { width:100%; height: min(64vh, 520px); min-height: 360px; }
 .ar-button { position:absolute; right:16px; bottom:16px; border-radius:999px; padding: 12px 18px; color:#1a1008; background:var(--gold); font-weight:900; }
 .viewer-progress { position:absolute; left:16px; bottom:18px; color: var(--muted); }
 .related-section { margin-top: 28px; }
-.related-card { padding:18px; display:grid; gap:7px; }
+.related-card { position: relative; overflow: hidden; padding:18px; display:grid; gap:7px; }
 .related-card span { color:var(--gold); font-size:.82rem; text-transform:uppercase; letter-spacing:.12em; }
 .related-card em { color:var(--muted); font-style:normal; }
 .not-found { text-align:center; padding: 42px 20px; }
@@ -143,3 +143,26 @@ model-viewer { width:100%; height: min(64vh, 520px); min-height: 360px; }
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.001ms !important; }
 }
+
+/* WebGL experience layer: progressive enhancement above the Phase 1 layout. */
+body { isolation: isolate; }
+body::after { content:""; position: fixed; inset: -10%; pointer-events:none; z-index:-1; background: radial-gradient(circle at calc(50% + var(--scroll-depth, 0) * 12%) 18%, rgba(255,190,105,.10), transparent 30rem), radial-gradient(circle at 80% 70%, rgba(99,130,255,.08), transparent 24rem); filter: blur(8px); animation: ambience-drift 12s ease-in-out infinite alternate; }
+.webgl-hero { min-height: calc(100vh - 92px); }
+.table-theatre { min-height: clamp(440px, 58vw, 680px); border-radius: 38px; overflow: hidden; transform-style: preserve-3d; }
+.experience-canvas { position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:.98; filter: saturate(1.08) contrast(1.04); }
+.experience-canvas + .table-surface, .experience-canvas ~ .plate-orb { opacity: 0; }
+.table-theatre::before { content:""; position:absolute; inset:0; z-index:1; pointer-events:none; background: radial-gradient(circle at 50% 48%, transparent 0 24%, rgba(10,6,4,.18) 56%, rgba(10,6,4,.62) 100%), linear-gradient(180deg, rgba(255,204,125,.08), transparent 38%); mix-blend-mode: screen; }
+.table-theatre::after { content:""; position:absolute; inset:0; z-index:2; pointer-events:none; opacity:.16; background-image: linear-gradient(transparent 50%, rgba(255,255,255,.08) 50%), radial-gradient(rgba(255,255,255,.5) .45px, transparent .45px); background-size: 100% 4px, 15px 15px; }
+.floating-card { z-index:3; transform-style: preserve-3d; animation: card-breathe 6s ease-in-out infinite; }
+.dish-card, .related-card, .glass-panel, .viewer-card { transform-style: preserve-3d; opacity: .86; translate: 0 18px; transition: opacity .5s ease, translate .5s ease, border-color .18s ease; }
+.dish-card.is-visible, .related-card.is-visible, .glass-panel.is-visible, .viewer-card.is-visible { opacity:1; translate:0 0; }
+.tilt-card { will-change: transform; transform-origin: center; contain: layout paint; }
+.dish-card::before, .related-card::before { content:""; position:absolute; inset:0; pointer-events:none; border-radius: inherit; opacity:0; background: radial-gradient(circle at var(--card-glow-x, 50%) var(--card-glow-y, 50%), rgba(255,215,150,.18), transparent 42%); transition: opacity .25s ease; }
+.dish-card:hover::before, .related-card:hover::before { opacity:1; }
+.dish-card { box-shadow: 0 calc(24px + var(--shadow-lift, 0) * 2px) calc(70px + var(--shadow-lift, 0) * 3px) rgba(0,0,0,.34); }
+.filter-wrap { transform: translateZ(0); }
+.no-webgl-experience .experience-canvas { display:none; }
+@keyframes ambience-drift { to { transform: translate3d(1.5%, -1%, 0) scale(1.04); } }
+@keyframes card-breathe { 50% { translate: 0 -6px; } }
+@media (max-width: 767px) { .webgl-hero { min-height: auto; } .table-theatre { min-height: 430px; } .floating-card { width: 148px; } }
+@media (prefers-reduced-motion: reduce) { body::after, .floating-card { animation: none !important; } .experience-canvas { display:none; } .dish-card, .related-card, .glass-panel, .viewer-card { opacity:1; translate:0 0; } }
