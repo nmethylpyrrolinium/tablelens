@@ -143,3 +143,29 @@ model-viewer { width:100%; height: min(64vh, 520px); min-height: 360px; }
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.001ms !important; }
 }
+
+/* Phase 2 interactive engine layer */
+.hero-shell { position: relative; min-height: min(860px, calc(100vh - 80px)); }
+.table-theatre { isolation: isolate; transform-style: preserve-3d; }
+.webgl-stage { position: absolute; inset: -8% -6% -2%; width: 112%; height: 112%; display: block; z-index: 0; filter: saturate(1.08) contrast(1.05); }
+.table-theatre::before { content:""; position:absolute; inset:-6%; z-index:1; pointer-events:none; background: radial-gradient(circle at 45% 36%, transparent 0 28%, rgba(18,13,9,.22) 52%, rgba(5,3,2,.72) 100%); mix-blend-mode:multiply; }
+.table-theatre::after { content:""; position:absolute; inset: 8% 12% 5%; z-index:1; pointer-events:none; border-radius: 999px; background: radial-gradient(circle, rgba(255,205,127,.24), transparent 55%); filter: blur(28px); animation: engineGlow 7s ease-in-out infinite; }
+.table-surface, .plate-orb { opacity: .18; z-index: 2; }
+.floating-card { z-index: 3; transform-style: preserve-3d; will-change: transform; animation: cardDrift 6s ease-in-out infinite; }
+.floating-card-two { animation-delay: -1.6s; }
+.floating-card-three { animation-delay: -3.1s; }
+body::after { content:""; position: fixed; inset: 0; pointer-events: none; z-index: -1; background: radial-gradient(circle at calc(50% + 10vw) 20%, rgba(255,195,107,.08), transparent 28rem), linear-gradient(120deg, transparent, rgba(255,255,255,.025), transparent); animation: ambientSweep 14s ease-in-out infinite alternate; }
+.tilt-card { transform: perspective(900px) rotateX(var(--card-rx, 0deg)) rotateY(var(--card-ry, 0deg)) translate3d(0, var(--card-lift, 0px), 0); box-shadow: 0 var(--card-shadow-y, 24px) 70px rgba(0,0,0,.34); transform-style: preserve-3d; will-change: transform, box-shadow; transition: border-color .18s ease, background .18s ease; }
+.tilt-card .dish-image, .tilt-card .dish-card-body, .related-card > * { transform: translateZ(18px); }
+.dish-card::before, .related-card::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.4; background: radial-gradient(circle at 50% 0%, rgba(255,255,255,.12), transparent 38%); transform: translateZ(1px); }
+.dish-card, .related-card { position: relative; opacity: 0; translate: 0 24px; }
+.glass-panel, .viewer-card, .menu-hero, .steps { opacity: 0; translate: 0 18px; transition: opacity .75s ease, translate .75s ease; }
+.is-revealed { opacity: 1; translate: 0 0; }
+.filter-wrap { transform: translateZ(0); }
+.category-pill { transition: transform .2s ease, background .2s ease, color .2s ease; }
+.category-pill:hover { transform: translateY(-2px); }
+@keyframes engineGlow { 50% { opacity: .58; transform: scale(1.04); } }
+@keyframes cardDrift { 50% { translate: 0 -8px; } }
+@keyframes ambientSweep { to { transform: translate3d(2vw, -1vh, 0); opacity:.8; } }
+@media (max-width: 767px) { .webgl-stage { opacity: .78; } .table-surface, .plate-orb { opacity: .1; } .hero-shell { min-height: auto; } }
+@media (prefers-reduced-motion: reduce) { .webgl-stage { display:none; } .glass-panel, .viewer-card, .menu-hero, .steps, .dish-card, .related-card { opacity:1; translate:0 0; } .tilt-card { transform:none !important; } body::after, .table-theatre::after, .floating-card { animation:none !important; } }

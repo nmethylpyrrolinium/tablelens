@@ -1,9 +1,22 @@
+import { TimingSystem } from "./engine/core/TimingSystem.js";
+import { PointerSystem } from "./engine/interaction/PointerSystem.js";
+import { QualityManager } from "./engine/utilities/QualityManager.js";
+import { WebGLExperience } from "./engine/renderer/WebGLRenderer.js";
+import { TableScene } from "./engine/scene/TableScene.js";
+import { CameraController } from "./engine/camera/CameraController.js";
+import { CardPhysicsSystem } from "./engine/ui/CardPhysics.js";
+import { ScrollRevealSystem } from "./engine/ui/ScrollReveals.js";
+
 (function () {
   "use strict";
 
   const REQUIRED_CATEGORIES = ["All", "Burgers", "Drinks", "Desserts"];
   let activeCategory = "All";
   let reduceMotion = false;
+  let timing;
+  let pointerSystem;
+  let cardPhysics;
+  let scrollReveals;
 
   function safeQuerySelector(selector, root = document) {
     return root ? root.querySelector(selector) : null;
@@ -189,18 +202,33 @@
   }
 
   function initCardTilt() {
-    if (reduceMotion) return;
-    document.querySelectorAll(".tilt-card").forEach((card) => {
-      if (card.dataset.tiltReady) return;
-      card.dataset.tiltReady = "true";
-      card.addEventListener("pointermove", (event) => {
-        if (event.pointerType === "touch") return;
-        const rect = card.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width - 0.5) * 5;
-        const y = ((event.clientY - rect.top) / rect.height - 0.5) * -5;
-        card.style.transform = `perspective(900px) rotateX(${y}deg) rotateY(${x}deg) translateY(-2px)`;
-      });
-      card.addEventListener("pointerleave", () => { card.style.transform = ""; });
+    cardPhysics?.scan();
+    scrollReveals?.scan();
+  }
+
+  function initExperienceSystems() {
+    timing = new TimingSystem({ reducedMotion: reduceMotion });
+    pointerSystem = new PointerSystem({ timing, reducedMotion: reduceMotion });
+    cardPhysics = new CardPhysicsSystem({ timing, reducedMotion: reduceMotion });
+    scrollReveals = new ScrollRevealSystem({ reducedMotion: reduceMotion });
+    document.body.classList.toggle("reduced-motion", reduceMotion);
+    initLandingScene();
+    scrollReveals.scan();
+    timing.start();
+  }
+
+  function initLandingScene() {
+    const canvas = safeQuerySelector("#tableLensScene");
+    if (!canvas || reduceMotion) return;
+    const quality = new QualityManager();
+    new WebGLExperience({
+      canvas,
+      timing,
+      pointer: pointerSystem,
+      quality,
+      reducedMotion: reduceMotion,
+      createScene: () => new TableScene({ particleScale: quality.particleScale, pointer: pointerSystem, reducedMotion: reduceMotion }),
+      createCameraController: (camera) => new CameraController(camera, { pointer: pointerSystem, reducedMotion: reduceMotion })
     });
   }
 
@@ -212,6 +240,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initReducedMotion();
+    initExperienceSystems();
     if (getCurrentPage() === "menu") renderMenuPage();
     if (getCurrentPage() === "dish") renderDishPage();
   });
