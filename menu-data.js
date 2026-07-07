@@ -54,3 +54,6 @@ const MENU = [
     accent: "#b56d4c"
   }
 ];
+
+window.RESTAURANT = RESTAURANT;
+window.MENU = MENU;
