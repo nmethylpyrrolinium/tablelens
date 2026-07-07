@@ -1,0 +1,34 @@
+restaurant:
+  name: Walnut & Ember Cafe
+  tagline: A cinematic cafe menu for the table in front of you.
+  locationLabel: TableLens Phase 1 Demo
+  currency: INR
+  currencySymbol: ₹
+  theme: dark-walnut-gold
+  demoNote: Tap any dish to preview it in 3D.
+theme:
+  id: dark-walnut-gold
+  primaryColor: '#d89b45'
+  backgroundColor: '#130f0b'
+assets:
+  images: assets/images
+  models: assets/models
+  qr: assets/qr
+  generated: generated
+output: dist
+compression:
+  imageQuality: 82
+  maxImageWidth: 1600
+  thumbnailWidth: 480
+pwa:
+  enabled: true
+ar:
+  requireGlb: true
+  requireUsdz: true
+qr:
+  baseUrl: https://example.com/tablelens/
+  targets: [home, menu, dishes]
+validation:
+  maxImageBytes: 5242880
+  maxModelBytes: 25000000
+  strictAssets: false
