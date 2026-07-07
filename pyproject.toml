@@ -1,0 +1,16 @@
+[project]
+name = "tablelens"
+version = "0.1.0"
+description = "Static-site compiler and asset pipeline for TableLens"
+requires-python = ">=3.12"
+dependencies = ["typer>=0.12", "rich>=13", "pydantic>=2", "PyYAML>=6", "Pillow>=10", "qrcode>=7"]
+
+[project.scripts]
+tablelens = "compiler.cli.app:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.setuptools.packages.find]
+include = ["compiler*"]

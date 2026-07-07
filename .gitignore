@@ -1,0 +1,6 @@
+.tablelens-cache/
+tablelens.egg-info/
+dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/

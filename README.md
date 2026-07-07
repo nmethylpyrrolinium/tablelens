@@ -1,136 +1,149 @@
 # TableLens
 
-TableLens is a hard-coded static WebAR cafe menu demo with browser 3D previews and AR launch support.
+TableLens is a static WebAR restaurant menu and, as of this phase, a Python-powered static-site compiler and asset pipeline. Developers edit structured source files (`tablelens.config.yaml` and `menu.yaml`) and run one command:
 
-## What it does
+```bash
+tablelens build
+```
 
-- Opens as a static mobile-first website from a QR code or link.
-- Shows a premium cafe-style landing page.
-- Renders a hard-coded menu from `menu-data.js`.
-- Filters dishes by category without reloading.
-- Opens dish detail pages with `dish.html?id=<dish-id>`.
-- Wires dish model paths into Google's `<model-viewer>` component.
-- Keeps non-AR and missing-asset states usable with helper text and fallbacks.
+The compiler validates the restaurant data, optimizes assets, generates frontend data, produces QR codes, and emits a production-ready `dist/` folder without requiring manual edits to `menu-data.js`.
 
-## Demo flow
-
-1. Open `index.html`.
-2. Tap **Open Demo Menu** to visit `menu.html`.
-3. Filter the menu or tap a dish card.
-4. `dish.html` reads the `id` query parameter and renders the matching dish.
-5. The 3D stage loads the dish GLB and USDZ paths into `<model-viewer>`.
-6. Supported phones can use the model-viewer AR button to launch AR.
-
-## Tech stack
-
-- HTML
-- CSS
-- Vanilla JavaScript
-- Google `<model-viewer>` web component
-- Static assets and relative paths for GitHub Pages
-
-No backend, database, login, framework, build step, analytics, or ordering system is included in Phase 1.
-
-## File structure
+## Architecture
 
 ```text
 tablelens/
-├── index.html
-├── menu.html
-├── dish.html
-├── style.css
-├── script.js
-├── menu-data.js
-├── manifest.json
-├── README.md
-└── assets/
-    ├── images/
-    │   ├── burger.jpg
-    │   ├── iced-coffee.jpg
-    │   └── chocolate-dessert.jpg
-    ├── models/
-    │   ├── burger.glb
-    │   ├── burger.usdz
-    │   ├── iced-coffee.glb
-    │   ├── iced-coffee.usdz
-    │   ├── chocolate-dessert.glb
-    │   └── chocolate-dessert.usdz
-    └── qr/
-        └── tablelens-demo-qr.png
+├── compiler/              # Python CLI, schemas, pipeline, plugin hooks
+│   ├── cli/               # Typer command modules and app entrypoint
+│   ├── core/              # IO, cache, reporting helpers
+│   ├── pipeline/          # build, validation, image, model, QR stages
+│   ├── plugins/           # lightweight future extension contracts
+│   └── schemas/           # strict Pydantic config and menu schemas
+├── engine/                # Existing Phase 2 Three.js experience layer
+├── assets/                # Source images, models, and QR placeholders
+├── generated/             # Generated source artifacts, including menu-data.js
+├── dist/                  # Production build output
+├── docs/                  # Developer architecture notes
+├── tests/                 # Pytest coverage for schemas, CLI, and builds
+├── tablelens.config.yaml  # Project configuration
+├── menu.yaml              # Structured restaurant menu source
+└── pyproject.toml         # Python package metadata and tablelens executable
 ```
 
-The Phase 1 code references the asset paths above. Binary demo assets are not committed here; the UI uses CSS image placeholders and a model-viewer error fallback when files are unavailable or invalid.
+Existing Phase 1 and Phase 2 frontend files remain intact. The compiler builds on top of them by copying the static experience into `dist/` and replacing the old manual menu-data workflow with generated data.
 
-## How menu data works
+## Developer Pipeline
 
-`menu-data.js` exposes two editable constants:
+1. Edit `tablelens.config.yaml` for restaurant metadata, theme, assets, output folders, PWA/AR settings, QR targets, validation limits, and quality presets.
+2. Edit `menu.yaml` or `menu.json` for categories and dishes.
+3. Add source images to `assets/images/` and models to `assets/models/`.
+4. Run `tablelens validate`.
+5. Run `tablelens build`.
+6. Deploy the generated `dist/` directory.
 
-- `RESTAURANT`: demo restaurant metadata such as name, tagline, currency, theme, and note.
-- `MENU`: exactly three Phase 1 dish objects.
+## Build Flow
 
-Each dish includes `id`, `name`, `category`, `price`, `type`, `spice`, `description`, `tags`, `portionNote`, `image`, `modelGlb`, `modelUsdz`, and `accent`.
-
-`script.js` reads this data and renders the menu and dish pages. Cards are not hard-coded in HTML.
-
-## How to add a dish
-
-1. Add a new object to the `MENU` array in `menu-data.js`.
-2. Give it a unique URL-safe `id`.
-3. Add image, GLB, and USDZ asset paths.
-4. Place the image in `assets/images/`.
-5. Place the `.glb` and `.usdz` files in `assets/models/`.
-6. Open `dish.html?id=<your-id>` to verify the detail page.
-
-If a category is new, the filter rail will include it automatically. The Phase 1 demo categories `All`, `Burgers`, `Drinks`, and `Desserts` always remain available.
-
-## How 3D/AR works
-
-The dish page loads:
-
-```html
-<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+```text
+Discover
+  -> load tablelens.config.yaml and menu.yaml/json
+Validate
+  -> strict Pydantic schemas plus asset reference checks
+Optimize
+  -> resize, compress, and thumbnail supported images
+Generate
+  -> generated/menu-data.js and QR PNG/SVG files
+Compile
+  -> copy existing static frontend and engine files
+Copy assets
+  -> copy models and optimized images into dist/assets
+Emit
+  -> write dist/menu-data.js and summary report
 ```
 
-For each dish, JavaScript creates a `<model-viewer>` element and assigns:
+Failures in validation stop later build stages. User mistakes are reported through Rich tables and concise messages rather than Python stack traces.
 
-- `src` from `dish.modelGlb` for web and Android 3D/Scene Viewer paths.
-- `ios-src` from `dish.modelUsdz` for iOS Quick Look.
-- `ar` to enable AR launch behavior.
-- `ar-modes="webxr scene-viewer quick-look"` for WebXR, Android Scene Viewer, and iOS Quick Look support.
-- `camera-controls`, `auto-rotate`, `shadow-intensity`, `exposure`, and `ar-scale="fixed"` for the Phase 1 viewing experience.
+## CLI Reference
 
-AR support depends on the device, browser, OS, model validity, and deployment context. WebXR AR requires HTTPS. GitHub Pages is suitable because it serves sites over HTTPS.
+| Command | Purpose |
+| --- | --- |
+| `tablelens init` | Create starter project files when missing. |
+| `tablelens validate` | Validate configuration, menu schema, references, prices, colors, and assets. |
+| `tablelens build` | Run the complete production build pipeline. |
+| `tablelens clean` | Safely remove build output and cache. |
+| `tablelens doctor` | Check required project files and local health. |
+| `tablelens audit` | Run validation and model audit reports together. |
+| `tablelens optimize-images` | Resize, compress, and thumbnail supported image files. |
+| `tablelens validate-models` | Check GLB/USDZ references, naming, duplicates, and existence. |
+| `tablelens generate-qr` | Generate PNG and SVG QR codes for configured targets. |
+| `tablelens manifest` | Print generated output locations. |
+| `tablelens stats` | Print dish, category, and output statistics. |
+| `tablelens version` | Print compiler version. |
+| `tablelens help` / `tablelens --help` | Show command help from Typer. |
 
-## Asset requirements
+## Configuration
 
-Recommended production assets:
+`tablelens.config.yaml` supports:
 
-- Optimized JPG or WebP food images with matching committed `.jpg` paths or updated data paths.
-- Valid GLB models for browser viewing and Android.
-- Valid USDZ models for iOS Quick Look.
-- A generated QR PNG that points to the deployed GitHub Pages URL.
+- `restaurant`: name, tagline, location label, ISO-like currency code, display symbol, theme, demo note.
+- `theme`: theme id and validated hex colors.
+- `assets`: source image/model/QR/generated folders.
+- `output`: production build folder, default `dist`.
+- `compression`: image quality, max image width, thumbnail width.
+- `pwa`: PWA feature toggle for future expansion.
+- `ar`: GLB/USDZ required flags.
+- `qr`: base URL and targets.
+- `validation`: max image/model sizes and strict asset behavior.
 
-Keep models compressed and mobile-friendly. Do not commit very large binary files unless they are intentionally optimized for the demo.
+## Data Source and Generated Files
 
-## GitHub Pages deployment
+Developers should not manually edit `menu-data.js`. The source of truth is now `menu.yaml` or `menu.json`.
 
-1. Commit the static files to a GitHub repository.
-2. In repository settings, enable GitHub Pages for the target branch and root folder.
-3. Open the HTTPS GitHub Pages URL.
-4. Generate a QR code that points to that URL and save it as `assets/qr/tablelens-demo-qr.png` if needed.
-5. Test AR on real supported devices over HTTPS.
+Generated files:
 
-All internal links use relative paths, so the site works under a GitHub Pages project subpath.
+- `generated/menu-data.js`: source-side generated JavaScript constants for inspection and tooling.
+- `dist/menu-data.js`: production JavaScript consumed by the existing frontend.
+- `dist/assets/images/*`: optimized full-size image copies.
+- `dist/assets/thumbnails/*`: generated thumbnails.
+- `dist/assets/models/*`: copied model assets.
+- `dist/assets/qr/*.png`: QR code bitmaps.
+- `dist/assets/qr/*.svg`: QR code vectors.
 
-## Limitations
+## Validation Rules
 
-- Phase 1 has no backend, database, dashboard, ordering flow, authentication, payments, or analytics.
-- The demo includes only three hard-coded dishes.
-- Placeholder handling is used until real image and 3D model binaries are added.
-- Desktop browsers usually show the 3D viewer but may not support AR.
-- AR was not validated on a physical phone in this repository setup.
+Schema validation checks:
 
-## Phase roadmap
+- Restaurant name is present.
+- Currency is one of `INR`, `USD`, `EUR`, `GBP`, `JPY`, `CAD`, or `AUD`.
+- Theme colors and dish accent colors are valid hex colors.
+- Menu is not empty.
+- Dish IDs are unique and URL-safe lowercase slugs.
+- Dish names and descriptions are present.
+- Prices are non-negative.
+- Category references are valid when categories are declared.
+- Image, GLB, and USDZ references are checked for existence.
+- Image and model files are checked against configured size limits.
+- Duplicate model references are reported.
+- Model extensions must match `.glb` and `.usdz`.
+- Local asset references are validated; external URLs are not executed.
+
+With `validation.strictAssets: false`, missing demo assets are warnings so placeholder-only development remains possible. With strict mode enabled, missing required AR assets fail validation.
+
+## Asset Rules
+
+- Images: `.jpg`, `.jpeg`, `.png`, and `.webp` are supported by the optimizer. WebP/AVIF expansion is reserved in the pipeline design.
+- Models: GLB is used for browser/Android, USDZ for iOS Quick Look.
+- QR: configured targets produce both PNG and SVG where practical.
+- Output writes are protected so the compiler refuses to write outside the project root.
+
+## Performance Considerations
+
+- The build cache stores SHA-256 hashes in `.tablelens-cache/hashes.json` and skips unchanged image optimization when outputs already exist.
+- Pipeline stages are isolated so independent stages can be parallelized later.
+- Validation avoids executing project files and uses direct structured data parsing.
+- Filesystem scans are limited to configured asset folders rather than broad repository walks.
+
+## Plugin Extension Points
+
+`compiler/plugins/hooks.py` defines a minimal plugin protocol and manager. Future plugins can observe stages for analytics, cloud sync, CDN deployment, invoices, AI menu generation, Blender integration, localization, versioning, theme marketplaces, or restaurant dashboards. No external project plugins are executed in this phase.
 
 - Phase 2: replace placeholders with optimized real food images and mobile-ready GLB/USDZ assets.
 - Phase 2: add QR artwork and restaurant-specific theming options.
