@@ -189,19 +189,8 @@
   }
 
   function initCardTilt() {
-    if (reduceMotion) return;
-    document.querySelectorAll(".tilt-card").forEach((card) => {
-      if (card.dataset.tiltReady) return;
-      card.dataset.tiltReady = "true";
-      card.addEventListener("pointermove", (event) => {
-        if (event.pointerType === "touch") return;
-        const rect = card.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width - 0.5) * 5;
-        const y = ((event.clientY - rect.top) / rect.height - 0.5) * -5;
-        card.style.transform = `perspective(900px) rotateX(${y}deg) rotateY(${x}deg) translateY(-2px)`;
-      });
-      card.addEventListener("pointerleave", () => { card.style.transform = ""; });
-    });
+    /* Physical card motion is handled by engine/ui/PhysicalCards.js.
+       This compatibility hook remains so Phase 1 rendering can stay untouched. */
   }
 
   function initReducedMotion() {
