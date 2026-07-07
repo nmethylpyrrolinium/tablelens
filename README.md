@@ -145,22 +145,7 @@ With `validation.strictAssets: false`, missing demo assets are warnings so place
 
 `compiler/plugins/hooks.py` defines a minimal plugin protocol and manager. Future plugins can observe stages for analytics, cloud sync, CDN deployment, invoices, AI menu generation, Blender integration, localization, versioning, theme marketplaces, or restaurant dashboards. No external project plugins are executed in this phase.
 
-## Troubleshooting
-
-- Missing `menu.yaml`: create one or run `tablelens init`.
-- Invalid price: use a numeric value greater than or equal to zero.
-- Invalid ID: use lowercase URL-safe slugs such as `signature-burger`.
-- Missing model warnings: add matching files under `assets/models/` or disable strict asset validation while prototyping.
-- QR points to the wrong domain: update `qr.baseUrl` in `tablelens.config.yaml`.
-- Clean rebuild: run `tablelens clean && tablelens build`.
-
-## Existing WebAR Experience
-
-The existing static frontend, model-viewer integration, menu rendering, modular Three.js experience layer, camera engine, interaction engine, physical animation system, and performance scheduler are preserved. The generated `menu-data.js` keeps the same `RESTAURANT` and `MENU` constants that `script.js` already consumes.
-
-## Known Limitations
-
-- The compiler validates model file existence, size, extension, duplicates, and references, but it does not parse GLB/USDZ internals yet.
-- AVIF output is not implemented yet.
-- The plugin system is an architecture hook only; third-party plugins are not loaded.
-- Missing demo binary assets remain warnings by default to preserve the placeholder-friendly repository setup.
+- Phase 2: replace placeholders with optimized real food images and mobile-ready GLB/USDZ assets.
+- Phase 2: add QR artwork and restaurant-specific theming options.
+- Phase 2: add stronger local validation for model availability and asset sizes.
+- Phase 3: consider a lightweight content pipeline only if static editing becomes limiting.

@@ -1,5 +1,16 @@
+import { VectorSpring } from '../animation/Spring.js';
 export class PointerSystem {
-  constructor(root = window) { this.x = 0; this.y = 0; this.tx = 0; this.ty = 0; this.velocityX = 0; this.velocityY = 0; this.active = false; root.addEventListener('pointermove', (e) => { const nx = (e.clientX / innerWidth - .5) * 2; const ny = (e.clientY / innerHeight - .5) * 2; this.velocityX = nx - this.tx; this.velocityY = ny - this.ty; this.tx = nx; this.ty = ny; this.active = true; }, { passive: true }); root.addEventListener('pointerleave', () => { this.tx = 0; this.ty = 0; this.active = false; }, { passive: true }); }
-  update(dt) { const ease = 1 - Math.exp(-7 * dt); this.x += (this.tx - this.x) * ease; this.y += (this.ty - this.y) * ease; this.velocityX *= .92; this.velocityY *= .92; }
+  constructor({ timing, reducedMotion = false } = {}) {
+    this.reducedMotion = reducedMotion;
+    this.pointer = new VectorSpring(0, 0, 0, { stiffness: 90, damping: 18 });
+    this.raw = { x: 0, y: 0 };
+    window.addEventListener('pointermove', (event) => {
+      this.raw.x = (event.clientX / window.innerWidth - 0.5) * 2;
+      this.raw.y = (event.clientY / window.innerHeight - 0.5) * 2;
+      if (!this.reducedMotion) this.pointer.setTarget(this.raw.x, this.raw.y, 0);
+    }, { passive: true });
+    timing?.add((dt) => this.pointer.update(dt));
+  }
+  get x() { return this.pointer.x.value; }
+  get y() { return this.pointer.y.value; }
 }
-export const pointer = new PointerSystem();
